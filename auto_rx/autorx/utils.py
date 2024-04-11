@@ -27,6 +27,7 @@ from queue import Queue
 from . import __version__ as auto_rx_version
 
 
+
 # List of binaries we check for on startup
 REQUIRED_RS_UTILS = [
     "dft_detect",
@@ -894,8 +895,10 @@ def reset_all_rtlsdrs():
 
     # If not Linux, raise exception and let auto_rx.py convert it to exit status code.
     if is_not_linux():
-        logging.debug("RTLSDR - Not a native Linux system, skipping reset attempt.")
-        raise SystemError("SDR unresponsive")
+        #logging.debug("RTLSDR - Not a native Linux system, skipping reset attempt.")
+        logging.debug("Resetting via macos fix")
+        subprocess.check_call("/Users/Kyoto/Documents/Prosjekt/Radiosonde/macos_usbdev_reset/devreset", shell=True)
+        return
 
     lsusb_info = lsusb()
     bus_num = None
@@ -950,6 +953,7 @@ def rtlsdr_test(device_idx="0", rtl_sdr_path="rtl_sdr", retries=5):
         rtl_sdr_path,
         str(device_idx),
     )
+    logging.debug("RTLSDR Test is running {}".format(_rtl_cmd))
     
     # First, check if the RTLSDR with a provided serial number is present.
     if device_idx == "0":

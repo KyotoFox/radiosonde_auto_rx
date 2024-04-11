@@ -1111,6 +1111,11 @@ class SondeScanner(object):
                     % (len(peak_frequencies), str(peak_frequencies / 1e6))
                 )
 
+                # if len(peak_frequencies) == 1:
+                #     self.log_info("Unlikely to find only one freq, resetting…")
+                #     reset_all_rtlsdrs()
+                #     time.sleep(5)
+
         else:
             # We have been provided a only_scan list - scan through the supplied frequencies.
             peak_frequencies = np.array(self.only_scan) * 1e6
