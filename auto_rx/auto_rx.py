@@ -818,8 +818,12 @@ def main():
     autorx.logging_path = logging_path
 
     # Configure logging
-    _log_suffix = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H%M%S_system.log")
+    _log_time = datetime.datetime.now(datetime.timezone.utc)
+    _log_suffix = _log_time.strftime("%Y%m%d-%H%M%S_system.log")
     _log_path = os.path.join(logging_path, _log_suffix)
+
+    _fsk_log_suffix = _log_time.strftime("%Y%m%d-%H%M%S_fsk_demod.log")
+    _fsk_log_path = os.path.join(logging_path, _fsk_log_suffix)
 
     system_log_enabled = False
 
@@ -831,7 +835,7 @@ def main():
             filename=_log_path,
             level=logging_level,
         )
-        logging.info("Opened new system log file: %s" % _log_path)
+        logging.info("Opened new system log file (via args): %s" % _log_path)
         # Also add a separate stdout logger.
         stdout_format = logging.Formatter("%(asctime)s %(levelname)s:%(message)s")
         stdout_handler = logging.StreamHandler(sys.stdout)
@@ -892,12 +896,22 @@ def main():
             stdout_handler.setFormatter(stdout_format)
             logging.getLogger().addHandler(stdout_handler)
             system_log_enabled = True
-            logging.info("Opened new system log file: %s" % _log_path)
+            logging.info("Opened new system log file (via config): %s" % _log_path)
 
     if config["enable_debug_logging"]:
         # Set log level to logging.DEBUG
         logging.getLogger().setLevel(logging.DEBUG)
         logging.debug("Log level set to DEBUG based on configuration file setting.")
+
+
+    # FSK demod stats file
+    fskfilehandler = logging.FileHandler(_fsk_log_path)
+    fskfilehandler.setFormatter(logging.Formatter("%(asctime)s %(message)s"))
+    fsklogger = logging.getLogger("fskdemodstats")
+    fsklogger.setLevel(logging.DEBUG)
+    fsklogger.addHandler(fskfilehandler)
+    fsklogger.propagate = False
+    logging.info("ENABLED FSK LOGS")
 
     # Add the web interface logging handler.
     web_handler = WebHandler()

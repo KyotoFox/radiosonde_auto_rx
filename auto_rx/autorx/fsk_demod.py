@@ -47,6 +47,8 @@ class FSKDemodStats(object):
         self.fft = []
         self.ppm = 0.0
 
+        self.fskdemodstatsLogger = logging.getLogger("fskdemodstats")
+
     def update(self, data):
         """
         Update the statistics parser with a new set of output from fsk_demod.
@@ -67,6 +69,7 @@ class FSKDemodStats(object):
             # Attempt to parse string.
             try:
                 _data = json.loads(data)
+                #self.fskdemodstatsLogger.debug(data)
             except Exception as e:
                 # Be quiet for now...
                 # self.log_error("FSK Demod Stats - %s" % str(e))
