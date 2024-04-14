@@ -211,7 +211,7 @@ def stop_scanner():
         autorx.task_list.pop("SCAN")
 
 
-def start_decoder(freq, sonde_type, continuous=False):
+def start_decoder(freq, sonde_type, timeout_override=None):
     """Attempt to start a decoder thread for a given sonde.
 
     Args:
@@ -242,8 +242,9 @@ def start_decoder(freq, sonde_type, continuous=False):
         else:
             _exp_sonde_type = sonde_type
 
-        if continuous:
-            _timeout = 3600*6 # 6 hours before a 'continuous' decoder gets restarted automatically.
+        if timeout_override is not None:
+            #_timeout = 3600*6 # 6 hours before a 'continuous' decoder gets restarted automatically.
+            _timeout = timeout_override
         else:
             _timeout = config["rx_timeout"]
 
@@ -466,24 +467,14 @@ def clean_task_list():
                 % (_freq / 1e6)
             )
 
-    # Check if there is a scanner thread still running.
-    # If not, and if there is a SDR free, start one up again.
-    # Also check for a global scan inhibit flag.
-    if (
-        ("SCAN" not in autorx.task_list)
-        and (not autorx.scan_inhibit)
-        and (allocate_sdr(check_only=True) is not None)
-        and (len(config["always_decode"]) == 0) # HACK for now…
-    ):
-        # We have a SDR free, and we are not running a scan thread. Start one.
-        start_scanner()
-
     # Always-on decoders.
+    # TODO: Moving this part before start_scanner causes single-SDR systems to only run decoders if always_decode is defined!
     if len(config["always_decode"]) > 0:
         for _entry in config["always_decode"]:
             try:
                 _freq_hz = float(_entry[0])*1e6
                 _type = str(_entry[1])
+                _timestamps = _entry[2] if len(_entry) > 2 else None
             except:
                 logging.warning(f"Task Manager - Invalid entry found in always_decode list, skipping.")
                 continue
@@ -492,10 +483,48 @@ def clean_task_list():
                 # Already running a decoder here.
                 continue
             else:
+                run_decoder = True
+                timeout = 6*3600 # Default timeout for always-on decoder is 6 hours
+
+                if _timestamps is not None:
+                    run_decoder = False
+                    timestamp_period = 60 * 10   # 10 minutes
+
+                    # This decoder should only run at specific timestamps, check if we're close to one
+                    for timestamp in _timestamps:
+                        # TODO: This probably doesn't play nice if you're close to midnight, but is way easier to code for now :P
+                        todaystamp = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0, second=0, minute=0, hour=timestamp)
+                        diff = todaystamp - datetime.datetime.now(datetime.timezone.utc)
+
+                        #logging.debug("For timestamp {}: diff is {}".format(timestamp, diff.total_seconds()))
+
+                        if abs(diff.total_seconds()) < timestamp_period:
+                            # Timeout after grace period
+                            period_end = todaystamp + datetime.timedelta(seconds=timestamp_period)
+                            timeout = (period_end - datetime.datetime.now(datetime.timezone.utc)).total_seconds()
+                            logging.info("Close to possible launch, starting stand-by decoder {} @ {} (finishes in {}s)".format(_type, _freq_hz, timeout))
+                            run_decoder = True
+                            stop_scanner() # Doesn't feel right, but it works!
+                            break
+                            
                 # Try and start up a decoder.
-                if (allocate_sdr(check_only=True) is not None):
+                if (
+                    run_decoder 
+                    and (allocate_sdr(check_only=True) is not None)
+                ):
                     logging.info(f"Task Manager - Starting Always-On Decoder: {_type}, {_freq_hz/1e6:.3f} MHz")
-                    start_decoder(_freq_hz, _type, continuous=True)
+                    start_decoder(_freq_hz, _type, timeout_override=timeout)
+
+    # Check if there is a scanner thread still running.
+    # If not, and if there is a SDR free, start one up again.
+    # Also check for a global scan inhibit flag.
+    if (
+        ("SCAN" not in autorx.task_list)
+        and (not autorx.scan_inhibit)
+        and (allocate_sdr(check_only=True) is not None)
+    ):
+        # We have a SDR free, and we are not running a scan thread. Start one.
+        start_scanner()
 
 
 
