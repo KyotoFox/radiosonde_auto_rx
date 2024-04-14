@@ -473,6 +473,7 @@ def clean_task_list():
         ("SCAN" not in autorx.task_list)
         and (not autorx.scan_inhibit)
         and (allocate_sdr(check_only=True) is not None)
+        and (len(config["always_decode"]) == 0) # HACK for now…
     ):
         # We have a SDR free, and we are not running a scan thread. Start one.
         start_scanner()
