@@ -488,12 +488,13 @@ def clean_task_list():
 
                 if _timestamps is not None:
                     run_decoder = False
-                    timestamp_period = 60 * 10   # 10 minutes
+                    timestamp_period = 60 * 5  # 5 minutes
 
                     # This decoder should only run at specific timestamps, check if we're close to one
                     for timestamp in _timestamps:
                         # TODO: This probably doesn't play nice if you're close to midnight, but is way easier to code for now :P
-                        todaystamp = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0, second=0, minute=0, hour=timestamp)
+                        # TODO: Also, it's hardcoded to xx:10
+                        todaystamp = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0, second=0, minute=5, hour=timestamp)
                         diff = todaystamp - datetime.datetime.now(datetime.timezone.utc)
 
                         #logging.debug("For timestamp {}: diff is {}".format(timestamp, diff.total_seconds()))
