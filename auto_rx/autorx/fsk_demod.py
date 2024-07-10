@@ -47,7 +47,7 @@ class FSKDemodStats(object):
         self.fft = []
         self.ppm = 0.0
 
-        self.fskdemodstatsLogger = logging.getLogger("fskdemodstats")
+        #self.fskdemodstatsLogger = logging.getLogger("fskdemodstats")
 
     def update(self, data):
         """

@@ -906,13 +906,13 @@ def main():
 
 
     # FSK demod stats file
-    fskfilehandler = logging.FileHandler(_fsk_log_path)
-    fskfilehandler.setFormatter(logging.Formatter("%(asctime)s %(message)s"))
-    fsklogger = logging.getLogger("fskdemodstats")
-    fsklogger.setLevel(logging.DEBUG)
-    fsklogger.addHandler(fskfilehandler)
-    fsklogger.propagate = False
-    logging.info("ENABLED FSK LOGS")
+    # fskfilehandler = logging.FileHandler(_fsk_log_path)
+    # fskfilehandler.setFormatter(logging.Formatter("%(asctime)s %(message)s"))
+    # fsklogger = logging.getLogger("fskdemodstats")
+    # fsklogger.setLevel(logging.DEBUG)
+    # fsklogger.addHandler(fskfilehandler)
+    # fsklogger.propagate = False
+    # logging.info("ENABLED FSK LOGS")
 
     # Add the web interface logging handler.
     web_handler = WebHandler()
