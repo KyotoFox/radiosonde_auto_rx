@@ -24,8 +24,8 @@
 # KA9Q - Use a KA9Q SDR Server (Not yet implemented)
 # WARNING: These are still under development and may not work.
 #
-#sdr_type = RTLSDR
-sdr_type = KA9Q
+sdr_type = RTLSDR
+
 
 #
 # Number of SDRs or SDR Connection Threads to use
@@ -37,8 +37,7 @@ sdr_type = KA9Q
 # If SDR type is either KA9Q or SpyServer, this defines the maximum number of parallel
 # decoding/scan tasks. On a RPi 4, ~5 tasks are possible.
 #
-#sdr_quantity = 1
-sdr_quantity = 5
+sdr_quantity = 1
 
 
 #
@@ -48,7 +47,7 @@ sdr_quantity = 5
 # of the server needs to be defined below. Usually this will be running on the
 # same machine as auto_rx, so the defaults are usually fine.
 #
-sdr_hostname = sondepi.local
+sdr_hostname = localhost
 sdr_port = 5555
 
 #
@@ -116,10 +115,10 @@ bias = False
 # Note - when using either a KA9Q or SpyServer as the SDR backend, the frequency scan limits are set by the
 # Server.
 
-min_freq = 400.05
-max_freq = 406.0
-# min_freq = 400.5
-# max_freq = 405.5
+#min_freq = 400.05
+#max_freq = 406.0
+min_freq = 400.5
+max_freq = 405.5
 
 # After rx_timeout seconds of no valid data from a decoder, stop the decoder and go back to scanning (if a SDR is available)
 rx_timeout = 180
@@ -142,9 +141,9 @@ always_scan = [ 402.00, 401.00 ]
 # always_decode - Always-running decoders. Only possible in a multi-SDR (or network-based SDR) system.
 # List must be in the form: [[401.5,"RS41"], [402.5,"DFM"], [400.5,"M10"], [400.5,"IMET"]]
 # Valid sonde types: RS41, RS92, DFM, M10, M20, IMET, IMET5, MK2LMS, LMS6, MEISEI, MRZ, MTS01
-#always_decode = [["402.00","RS41",[23,11]]]
+always_decode = [["402.00","RS41",[23,11]]]
 #always_decode = [["402.00","RS41"]]
-always_decode = []
+#always_decode = []
 
 ####################
 # STATION LOCATION #
