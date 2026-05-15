@@ -81,3 +81,21 @@ function calculate_lookangles(a, b) {
     };
 }
 
+// Format a time-since-last-update value for display (e.g. "2s", "45m", "2h", "14h 13m").
+function formatRelativeAge(ageMs) {
+    var totalSeconds = Math.max(0, Math.floor(ageMs / 1000));
+    if (totalSeconds < 60) {
+        return totalSeconds + "s";
+    }
+    var totalMinutes = Math.floor(totalSeconds / 60);
+    if (totalMinutes < 60) {
+        return totalMinutes + "m";
+    }
+    var hours = Math.floor(totalMinutes / 60);
+    var minutes = totalMinutes % 60;
+    if (minutes === 0) {
+        return hours + "h";
+    }
+    return hours + "h " + minutes + "m";
+}
+
